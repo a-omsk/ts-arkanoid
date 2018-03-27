@@ -1,11 +1,13 @@
 import Brick from './Brick';
 import Vaus from './Vaus';
+import Ball from './Ball';
 
 export default class Game {
     public score: number;
     private ctx: CanvasRenderingContext2D;
     private bricks: Brick[];
     private vaus: Vaus | null;
+    private ball: Ball | null;
 
     public constructor(ctx: CanvasRenderingContext2D) {
         this.ctx = ctx;
@@ -14,6 +16,7 @@ export default class Game {
         this.score = 0;
 
         this.vaus = null;
+        this.ball = null;
     }
 
     private buildVaus(): void {
@@ -55,9 +58,19 @@ export default class Game {
         }
     }
 
-    private bindVausControl() {
+    private buildBall(): void {
+        const ballRadius = 12;
+
+        const ballX = Math.floor(this.ctx.canvas.clientWidth / 2) - ballRadius;
+        const ballY = this.ctx.canvas.clientHeight - (ballRadius * 2) - 80;
+
+        this.ball = new Ball(ballX, ballY, ballRadius, 'black');
+        this.ball.draw(this.ctx);
+    }
+
+    private bindVausControl(): void {
         const { canvas } = this.ctx;
-        const {left} = canvas.getBoundingClientRect();
+        const { left } = canvas.getBoundingClientRect();
 
         canvas.addEventListener('mousemove', e => {
             const newVausPosition = e.clientX - left;
@@ -68,7 +81,7 @@ export default class Game {
                 // todo: delete this
                 this.vaus.draw(this.ctx);
             }
-        }, {passive: true})
+        }, { passive: true })
 
     }
 
@@ -77,6 +90,7 @@ export default class Game {
 
         this.buildBricks();
         this.buildVaus();
+        this.buildBall();
 
         this.bindVausControl();
     }
