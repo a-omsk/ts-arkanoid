@@ -4,3 +4,6 @@
 # IDE
 .idea/
 .vscode
+
+node_modules
+dist/bundle.js
