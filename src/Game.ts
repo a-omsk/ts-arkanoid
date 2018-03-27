@@ -64,7 +64,10 @@ export default class Game {
         const ballX = Math.floor(this.ctx.canvas.clientWidth / 2) - ballRadius;
         const ballY = this.ctx.canvas.clientHeight - (ballRadius * 2) - 80;
 
-        this.ball = new Ball(ballX, ballY, ballRadius, 'black');
+        const dx = Math.floor(Math.random() * 4 + 4);
+        const dy = Math.floor(Math.random() * 4 + 4);
+
+        this.ball = new Ball(ballX, ballY, dx, dy, ballRadius, 'black');
         this.ball.draw(this.ctx);
     }
 
@@ -77,12 +80,25 @@ export default class Game {
 
             if (this.vaus) {
                 this.vaus.move(newVausPosition, canvas.width);
-
-                // todo: delete this
-                this.vaus.draw(this.ctx);
             }
         }, { passive: true })
 
+    }
+
+    private loop() {
+        if (this.vaus) {
+            this.vaus.draw(this.ctx);
+        }
+
+        if (this.ball) {
+            this.ball.changeDirectionIfIntersectsBorder(this.ctx);
+
+            this.ball.clear(this.ctx);
+            this.ball.move();
+            this.ball.draw(this.ctx);
+        }
+
+        requestAnimationFrame(() => this.loop());
     }
 
     public start(): void {
@@ -93,5 +109,14 @@ export default class Game {
         this.buildBall();
 
         this.bindVausControl();
+
+        const playButton = <HTMLElement>document.querySelector('.game-controls .play');
+
+        playButton.addEventListener('click', () => {
+            const canvasContainer = <HTMLElement>document.querySelector('.canvas-container');
+            canvasContainer.classList.add('playing');
+
+            this.loop();
+        });
     }
 }

@@ -28,16 +28,21 @@
     transform: translate(-50%, -50%);
 }
 
-.game-controls button {
+.canvas-container.playing .game-controls {
+    display: none;
+}
+
+.canvas-container:not(.failed) .game-controls > button.repeat {
+    display: none;
+}
+
+.canvas-container.failed .game-controls > button.play {
+    display: none;
+}
+
+.game-controls > button {
     width: 100px;
     height: 50px;
     border-radius: 10px;
 }
 
-.game-controls:not(.failed) button.repeat {
-    display: none;
-}
-
-.game-controls.failed button.play {
-    display: none;
-}
