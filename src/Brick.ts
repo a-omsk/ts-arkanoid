@@ -1,4 +1,6 @@
-export default class Brick {
+import CanvasShape from './CanvasShape';
+
+export default class Brick implements CanvasShape {
     public x: number;
     public y: number;
     public width: number;
@@ -21,7 +23,7 @@ export default class Brick {
 
     draw(ctx: CanvasRenderingContext2D) {
         if (this.destroyed) {
-            return false;
+            return;
         }
 
         ctx.save();
@@ -30,5 +32,13 @@ export default class Brick {
         ctx.fillRect(this.x, this.y, this.width, this.height);
 
         ctx.restore();
+    }
+
+    clear(ctx: CanvasRenderingContext2D) {
+        if (this.destroyed) {
+            return;
+        }
+
+        ctx.clearRect(this.x, this.y, this.width, this.height);
     }
 }

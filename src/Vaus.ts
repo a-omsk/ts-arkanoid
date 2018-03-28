@@ -1,4 +1,6 @@
-export default class Vaus {
+import CanvasShape from './CanvasShape';
+
+export default class Vaus implements CanvasShape {
     public x: number;
     public y: number;
 

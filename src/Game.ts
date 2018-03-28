@@ -76,7 +76,9 @@ export default class Game {
         const { left } = canvas.getBoundingClientRect();
 
         canvas.addEventListener('mousemove', e => {
-            const newVausPosition = e.clientX - left;
+            const newVausPosition = Math.floor(e.clientX - left);
+
+            console.log(newVausPosition, e.clientX, left);
 
             if (this.vaus) {
                 this.vaus.move(newVausPosition, canvas.width);
@@ -101,22 +103,16 @@ export default class Game {
         requestAnimationFrame(() => this.loop());
     }
 
-    public start(): void {
+    public init(): void {
         this.score = 0;
 
         this.buildBricks();
         this.buildVaus();
         this.buildBall();
+    }
 
+    public start(): void {
         this.bindVausControl();
-
-        const playButton = <HTMLElement>document.querySelector('.game-controls .play');
-
-        playButton.addEventListener('click', () => {
-            const canvasContainer = <HTMLElement>document.querySelector('.canvas-container');
-            canvasContainer.classList.add('playing');
-
-            this.loop();
-        });
+        this.loop();
     }
 }

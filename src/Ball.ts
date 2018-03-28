@@ -1,4 +1,6 @@
-export default class Ball {
+import CanvasShape from './CanvasShape';
+
+export default class Ball implements CanvasShape {
     public x: number;
     public y: number;
     public dx: number;

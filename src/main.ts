@@ -14,5 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const game = new Game(ctx);
 
-    game.start();
+    game.init();
+
+    const playButton = <HTMLElement>document.querySelector('.game-controls .play');
+
+    playButton.addEventListener('click', () => {
+        const canvasContainer = <HTMLElement>document.querySelector('.canvas-container');
+        canvasContainer.classList.add('playing');
+
+        game.start();
+    });
 });
