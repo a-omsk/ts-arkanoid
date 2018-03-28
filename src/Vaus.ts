@@ -1,4 +1,4 @@
-import CanvasShape from './CanvasShape';
+import CanvasShape, { CanvasShapeBounds } from './CanvasShape';
 
 export default class Vaus implements CanvasShape {
     public x: number;
@@ -23,7 +23,7 @@ export default class Vaus implements CanvasShape {
         this.color = color;
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
+    draw(ctx: CanvasRenderingContext2D): void {
         if (this.newX !== null && this.newX !== this.x) {
             this.clear(ctx);
 
@@ -39,11 +39,11 @@ export default class Vaus implements CanvasShape {
         ctx.restore();
     }
 
-    clear(ctx: CanvasRenderingContext2D) {
+    clear(ctx: CanvasRenderingContext2D): void {
         ctx.clearRect(this.x, this.y, this.width, this.height);
     }
 
-    move(x: number, maxWidth: number) {
+    move(x: number, maxWidth: number): void {
         const halfVausWidth = Math.floor(this.width / 2);
         const newX = x - halfVausWidth;
 
@@ -53,6 +53,15 @@ export default class Vaus implements CanvasShape {
             this.newX = maxWidth - this.width;
         } else {
             this.newX = newX;
+        }
+    }
+
+    getBounds(): CanvasShapeBounds {
+        return {
+            x1: this.x,
+            y1: this.y,
+            x2: this.x + this.width,
+            y2: this.y + this.height,
         }
     }
 }

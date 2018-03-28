@@ -8,8 +8,13 @@ export default class Game {
     private bricks: Brick[];
     private vaus: Vaus | null;
     private ball: Ball | null;
+    private mouseHandler: any;
 
-    public constructor(ctx: CanvasRenderingContext2D) {
+    private onScoreChanged: Function;
+    private onGameFinished: Function;
+    private onGameFailed: Function;
+
+    public constructor(ctx: CanvasRenderingContext2D, onScoreChanged: Function, onGameFinished: Function, onGameFailed: Function) {
         this.ctx = ctx;
 
         this.bricks = [];
@@ -17,6 +22,17 @@ export default class Game {
 
         this.vaus = null;
         this.ball = null;
+
+        this.mouseHandler = null;
+        this.onScoreChanged = onScoreChanged;
+        this.onGameFinished = onGameFinished;
+        this.onGameFailed = onGameFailed;
+    }
+
+    public clear(): void {
+        const { canvas } = this.ctx;
+
+        this.ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
     private buildVaus(): void {
@@ -27,17 +43,18 @@ export default class Game {
         const vausY = this.ctx.canvas.clientHeight - vausHeight - 10;
 
         this.vaus = new Vaus(vausX, vausY, vausWidth, vausHeight, 'green');
-
         this.vaus.draw(this.ctx);
     }
 
     private buildBricks(): void {
-        let currentColor = 'blue';
-        const initialColumnPosition = 70;
+        this.bricks = [];
 
-        const padding = 2;
+        let currentColor = 'blue';
+        const initialColumnPosition = 60;
+
+        const padding = 8;
         const width = 80;
-        const heigth = 40;
+        const heigth = 36;
 
         let rowY = 40;
 
@@ -75,36 +92,74 @@ export default class Game {
         const { canvas } = this.ctx;
         const { left } = canvas.getBoundingClientRect();
 
-        canvas.addEventListener('mousemove', e => {
+        this.mouseHandler = (e: MouseEvent) => {
             const newVausPosition = Math.floor(e.clientX - left);
-
-            console.log(newVausPosition, e.clientX, left);
 
             if (this.vaus) {
                 this.vaus.move(newVausPosition, canvas.width);
             }
-        }, { passive: true })
+        };
+
+        canvas.addEventListener('mousemove', this.mouseHandler, { passive: true })
 
     }
 
-    private loop() {
-        if (this.vaus) {
-            this.vaus.draw(this.ctx);
+    private unbindVausControl(): void {
+        const { canvas } = this.ctx;
+
+        canvas.removeEventListener('mousemove', this.mouseHandler);
+    }
+
+    private loop(): void {
+        const vaus = <Vaus>this.vaus;
+        const ball = <Ball>this.ball;
+
+        const hasBottomBorderIntersection = ball.changeDirectionIfIntersectsBorder(this.ctx);
+
+        if (hasBottomBorderIntersection) {
+            this.onGameFailed();
+            return;
         }
 
-        if (this.ball) {
-            this.ball.changeDirectionIfIntersectsBorder(this.ctx);
+        const hasVausIntersection = ball.isIntersectsShape(vaus.getBounds());
 
-            this.ball.clear(this.ctx);
-            this.ball.move();
-            this.ball.draw(this.ctx);
+        if (hasVausIntersection) {
+            ball.swapYDirection();
         }
+
+        for (let brickI = 0; brickI < this.bricks.length; brickI++) {
+            const brick = this.bricks[brickI];
+            const hasBrickIntersection = ball.isIntersectsShape(brick.getBounds());
+
+            if (hasBrickIntersection) {
+                ball.swapYDirection();
+
+                brick.clear(this.ctx);
+
+                this.bricks.splice(brickI, 1);
+                this.onScoreChanged(++this.score);
+
+                if (!this.bricks.length) {
+                    this.unbindVausControl();
+                    this.onGameFinished();
+                    return;
+                }
+
+                break;
+            }
+        }
+
+        ball.clear(this.ctx);
+        ball.move();
+
+        ball.draw(this.ctx);
+        vaus.draw(this.ctx);
 
         requestAnimationFrame(() => this.loop());
     }
 
     public init(): void {
-        this.score = 0;
+        this.clear();
 
         this.buildBricks();
         this.buildVaus();
@@ -112,6 +167,9 @@ export default class Game {
     }
 
     public start(): void {
+        this.score = 0;
+
+        this.onScoreChanged(this.score);
         this.bindVausControl();
         this.loop();
     }

@@ -1,4 +1,4 @@
-import CanvasShape from './CanvasShape';
+import CanvasShape, { CanvasShapeBounds } from './CanvasShape';
 
 export default class Ball implements CanvasShape {
     public x: number;
@@ -20,7 +20,7 @@ export default class Ball implements CanvasShape {
         this.color = color;
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
+    draw(ctx: CanvasRenderingContext2D): void {
         ctx.save();
 
         ctx.fillStyle = this.color;
@@ -31,37 +31,59 @@ export default class Ball implements CanvasShape {
         ctx.restore();
     }
 
-    move() {
+    move(): void {
         this.x = this.x + this.dx;
         this.y = this.y + this.dy;
     }
 
-    clear(ctx: CanvasRenderingContext2D) {
+    clear(ctx: CanvasRenderingContext2D): void {
         ctx.clearRect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2)
     }
 
-    changeDirectionIfIntersectsBorder(ctx: CanvasRenderingContext2D) {
+    getBounds(): CanvasShapeBounds {
+        return {
+            x1: this.x - this.radius,
+            y1: this.y - this.radius,
+            x2: this.x + this.radius,
+            y2: this.y + this.radius,
+        };
+    }
+
+    changeDirectionIfIntersectsBorder(ctx: CanvasRenderingContext2D): boolean | undefined {
         const { canvas } = ctx;
         const x = this.x - this.radius;
         const y = this.y - this.radius;
-        var size = this.radius * 2;
 
         if (x < 0) {
             this.x = this.radius;
-            this.dx = -this.dx;
+            this.swapXDirection();
         } else if (this.x + this.radius > canvas.width) {
             this.x = canvas.width - this.radius;
-            this.dx = -this.dx;
+            this.swapXDirection();
         }
 
         if (y < 0) {
             this.y = this.radius;
-            this.dy = -this.dy;
+            this.swapYDirection();
         } else if (this.y + this.radius > canvas.height) {
             this.y = canvas.height - this.radius;
-            this.dy = -this.dy;
+            this.swapYDirection();
 
             return true;
         }
+    }
+
+    isIntersectsShape(shapeBounds: CanvasShapeBounds): boolean {
+        const { x1, y1, x2, y2 } = this.getBounds();
+
+        return !(shapeBounds.x2 <= x1 || x2 <= shapeBounds.x1 || shapeBounds.y2 <= y1 || y2 <= shapeBounds.y1);
+    }
+
+    swapXDirection(): void {
+        this.dx = -this.dx;
+    }
+
+    swapYDirection(): void {
+        this.dy = -this.dy;
     }
 }

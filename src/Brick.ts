@@ -1,4 +1,4 @@
-import CanvasShape from './CanvasShape';
+import CanvasShape, { CanvasShapeBounds } from './CanvasShape';
 
 export default class Brick implements CanvasShape {
     public x: number;
@@ -6,8 +6,6 @@ export default class Brick implements CanvasShape {
     public width: number;
     public height: number;
     public color: string;
-
-    private destroyed: boolean;
 
     constructor(x: number, y: number, width: number, height: number, color: string) {
         this.x = x;
@@ -17,15 +15,9 @@ export default class Brick implements CanvasShape {
         this.height = height;
 
         this.color = color;
-
-        this.destroyed = false;
     }
 
-    draw(ctx: CanvasRenderingContext2D) {
-        if (this.destroyed) {
-            return;
-        }
-
+    draw(ctx: CanvasRenderingContext2D): void {
         ctx.save();
 
         ctx.fillStyle = this.color;
@@ -34,11 +26,16 @@ export default class Brick implements CanvasShape {
         ctx.restore();
     }
 
-    clear(ctx: CanvasRenderingContext2D) {
-        if (this.destroyed) {
-            return;
-        }
-
+    clear(ctx: CanvasRenderingContext2D): void {
         ctx.clearRect(this.x, this.y, this.width, this.height);
+    }
+
+    getBounds(): CanvasShapeBounds {
+        return {
+            x1: this.x,
+            y1: this.y,
+            x2: this.x + this.width,
+            y2: this.y + this.height,
+        }
     }
 }
