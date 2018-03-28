@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "basic typescript arkanoid implementation",
   "scripts": {
-    "compile": "webpack --config webpack.config.js",
-    "compile:watch": "webpack --config webpack.config.js --watch",
+    "compile": "webpack --config webpack.config.js --mode production",
+    "compile:watch": "webpack --config webpack.config.js --watch --mode development",
     "serve": "http-server dist -p 3000",
     "start": "npm run compile && npm run serve",
     "test": "echo \"Error: no test specified\" && exit 1"
