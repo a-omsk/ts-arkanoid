@@ -1,15 +1,12 @@
 import CanvasShape, { CanvasShapeBounds } from './CanvasShape';
 
-export default class Brick implements CanvasShape {
-    public x: number;
-    public y: number;
+export default class Brick extends CanvasShape {
     public width: number;
     public height: number;
     public color: string;
 
     constructor(x: number, y: number, width: number, height: number, color: string) {
-        this.x = x;
-        this.y = y;
+        super(x, y);
 
         this.width = width;
         this.height = height;

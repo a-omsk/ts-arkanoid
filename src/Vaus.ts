@@ -1,9 +1,6 @@
 import CanvasShape, { CanvasShapeBounds } from './CanvasShape';
 
-export default class Vaus implements CanvasShape {
-    public x: number;
-    public y: number;
-
+export default class Vaus extends CanvasShape {
     public width: number;
     public height: number;
 
@@ -12,8 +9,7 @@ export default class Vaus implements CanvasShape {
     public newX: number | null;
 
     constructor(x: number, y: number, width: number, height: number, color: string) {
-        this.x = x;
-        this.y = y;
+        super(x, y);
 
         this.newX = null;
 

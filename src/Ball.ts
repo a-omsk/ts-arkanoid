@@ -1,8 +1,6 @@
 import CanvasShape, { CanvasShapeBounds } from './CanvasShape';
 
-export default class Ball implements CanvasShape {
-    public x: number;
-    public y: number;
+export default class Ball extends CanvasShape {
     public dx: number;
     public dy: number;
 
@@ -10,6 +8,8 @@ export default class Ball implements CanvasShape {
     public color: string;
 
     constructor(x: number, y: number, dx: number, dy: number, radius: number, color: string) {
+        super(x, y);
+
         this.x = x;
         this.y = y;
 
@@ -71,12 +71,6 @@ export default class Ball implements CanvasShape {
 
             return true;
         }
-    }
-
-    isIntersectsShape(shapeBounds: CanvasShapeBounds): boolean {
-        const { x1, y1, x2, y2 } = this.getBounds();
-
-        return !(shapeBounds.x2 <= x1 || x2 <= shapeBounds.x1 || shapeBounds.y2 <= y1 || y2 <= shapeBounds.y1);
     }
 
     swapXDirection(): void {

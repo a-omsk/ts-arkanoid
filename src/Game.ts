@@ -1,11 +1,18 @@
 import Brick from './Brick';
 import Vaus from './Vaus';
 import Ball from './Ball';
+import Bonus from './Bonus';
+import {randomBoolGenerator} from './utils';
+
+const getRandomBool = randomBoolGenerator(10); // 10% possibility of bonus
 
 export default class Game {
     public score: number;
+    public level: number;
+
     private ctx: CanvasRenderingContext2D;
     private bricks: Brick[];
+    private bonuses: Bonus[];
     private vaus: Vaus | null;
     private ball: Ball | null;
     private mouseHandler: any;
@@ -18,7 +25,10 @@ export default class Game {
         this.ctx = ctx;
 
         this.bricks = [];
+        this.bonuses = [];
+
         this.score = 0;
+        this.level = 1;
 
         this.vaus = null;
         this.ball = null;
@@ -31,6 +41,8 @@ export default class Game {
 
     public clear(): void {
         const { canvas } = this.ctx;
+        this.bricks = [];
+        this.bonuses = [];
 
         this.ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
@@ -47,8 +59,6 @@ export default class Game {
     }
 
     private buildBricks(): void {
-        this.bricks = [];
-
         let currentColor = 'blue';
         const initialColumnPosition = 60;
 
@@ -81,8 +91,8 @@ export default class Game {
         const ballX = Math.floor(this.ctx.canvas.clientWidth / 2) - ballRadius;
         const ballY = this.ctx.canvas.clientHeight - (ballRadius * 2) - 80;
 
-        const dx = Math.floor(Math.random() * 4 + 4);
-        const dy = Math.floor(Math.random() * 4 + 4);
+        const dx = Math.floor(Math.random() * this.level + 4);
+        const dy = Math.floor(Math.random() * this.level + 4);
 
         this.ball = new Ball(ballX, ballY, dx, dy, ballRadius, 'black');
         this.ball.draw(this.ctx);
@@ -136,6 +146,18 @@ export default class Game {
 
                 brick.clear(this.ctx);
 
+                if (getRandomBool()) {
+                    const bonus = new Bonus(
+                        brick.x + ( brick.width / 2),
+                        brick.y + (brick.height / 2),
+                        2,
+                        8,
+                        'pink'
+                    );
+
+                    this.bonuses.push(bonus);
+                }
+
                 this.bricks.splice(brickI, 1);
                 this.onScoreChanged(++this.score);
 
@@ -149,13 +171,38 @@ export default class Game {
             }
         }
 
-        ball.clear(this.ctx);
-        ball.move();
-
-        ball.draw(this.ctx);
-        vaus.draw(this.ctx);
+        this.drawShapes();
 
         requestAnimationFrame(() => this.loop());
+    }
+
+    private drawShapes(): void {
+        const vaus = <Vaus>this.vaus;
+        const ball = <Ball>this.ball;
+
+        ball.clear(this.ctx);
+        this.bonuses.forEach(bonus => bonus.clear(this.ctx));
+
+        this.bricks.forEach(brick => brick.draw(this.ctx));
+        this.bonuses.forEach((bonus, i) => {
+            bonus.move();
+
+            if (bonus.isIntersectsShape(vaus.getBounds())) {
+                this.score += 10;
+                this.onScoreChanged(this.score);
+                this.bonuses.splice(i, 1);
+
+                bonus.clear(this.ctx);
+
+
+            } else {
+                bonus.draw(this.ctx);
+            }
+        })
+
+        ball.move();
+        ball.draw(this.ctx);
+        vaus.draw(this.ctx);
     }
 
     public init(): void {
