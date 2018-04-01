@@ -1,4 +1,5 @@
 import Game from './Game';
+import levelBrickSets from './levelBrickSets';
 
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = <HTMLCanvasElement>document.querySelector('.canvas');
@@ -16,19 +17,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const game = new Game(
         ctx,
+        levelBrickSets,
         function onScoreChanged(score: number) {
             const scoreCounter = <HTMLElement>document.querySelector('.game-score > .counter');
             scoreCounter.innerText = score.toString();
         },
-        function onGameFinished() {
+        function onLevelFinished() {
             game.init();
-
-            canvasContainer.classList.remove('failed');
             canvasContainer.classList.remove('playing');
+
+            const currentLevel = <HTMLElement>document.querySelector('.game-level > .level');
+
+            currentLevel.innerText = game.level.toString();
+        },
+        function onGameFinished() {
+            const scoreCounter = <HTMLElement>document.querySelector('.congratulations .score');
+            scoreCounter.innerText = game.score.toString();
+
+            canvasContainer.classList.remove('playing');
+            canvasContainer.classList.add('finished');
         },
         function onGameFailed() {
             canvasContainer.classList.remove('playing');
             canvasContainer.classList.add('failed');
+            game.resetLevels();
+            game.resetScore();
         });
 
     game.init();
@@ -43,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     repeatButton.addEventListener('click', () => {
+        canvasContainer.classList.remove('failed');
         canvasContainer.classList.add('playing');
 
         game.init();

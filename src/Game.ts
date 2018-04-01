@@ -2,13 +2,16 @@ import Brick from './Brick';
 import Vaus from './Vaus';
 import Ball from './Ball';
 import Bonus from './Bonus';
-import {randomBoolGenerator} from './utils';
+
+import { randomBoolGenerator } from './utils';
+import { BrickCoordsSets } from './levelBrickSets';
 
 const getRandomBool = randomBoolGenerator(10); // 10% possibility of bonus
 
 export default class Game {
     public score: number;
     public level: number;
+    public levels: BrickCoordsSets[];
 
     private ctx: CanvasRenderingContext2D;
     private bricks: Brick[];
@@ -23,14 +26,16 @@ export default class Game {
     private rightButtonPressed: boolean;
 
     private onScoreChanged: Function;
+    private onLevelFinished: Function;
     private onGameFinished: Function;
     private onGameFailed: Function;
 
-    public constructor(ctx: CanvasRenderingContext2D, onScoreChanged: Function, onGameFinished: Function, onGameFailed: Function) {
+    public constructor(ctx: CanvasRenderingContext2D, levels: BrickCoordsSets[], onScoreChanged: Function, onLevelFinished: Function, onGameFinished: Function, onGameFailed: Function) {
         this.ctx = ctx;
 
         this.bricks = [];
         this.bonuses = [];
+        this.levels = levels;
 
         this.score = 0;
         this.level = 1;
@@ -44,7 +49,9 @@ export default class Game {
         this.mouseHandler = null;
         this.buttonReleaseHandler = null;
         this.buttonPressHandler = null;
+
         this.onScoreChanged = onScoreChanged;
+        this.onLevelFinished = onLevelFinished;
         this.onGameFinished = onGameFinished;
         this.onGameFailed = onGameFailed;
     }
@@ -55,6 +62,14 @@ export default class Game {
         this.bonuses = [];
 
         this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    public resetLevels() {
+        this.level = 1;
+    }
+
+    public resetScore() {
+        this.score = 0;
     }
 
     private buildVaus(): void {
@@ -70,29 +85,22 @@ export default class Game {
 
     private buildBricks(): void {
         let currentColor = 'blue';
-        const initialColumnPosition = 60;
 
-        const padding = 8;
         const width = 80;
         const heigth = 36;
 
-        let rowY = 40;
+        const brickSet = this.levels[this.level - 1];
 
-        for (let i = 0; i < 36; i += 6) {
-            let columnX = initialColumnPosition;
-
-            for (let brickI = i; brickI < i + 6; brickI++) {
-                const brick = new Brick(columnX, rowY, width, heigth, currentColor);
+        brickSet.forEach(brickRow => {
+            brickRow.forEach(brickPos => {
+                const brick = new Brick(brickPos.x, brickPos.y, width, heigth, currentColor);
                 this.bricks.push(brick);
-
                 brick.draw(this.ctx);
 
-                columnX += width + padding
-            }
+            });
 
-            rowY += heigth + padding;
             currentColor = currentColor === 'blue' ? 'red' : 'blue';
-        }
+        });
     }
 
     private buildBall(): void {
@@ -185,7 +193,7 @@ export default class Game {
 
                 if (getRandomBool()) {
                     const bonus = new Bonus(
-                        brick.x + ( brick.width / 2),
+                        brick.x + (brick.width / 2),
                         brick.y + (brick.height / 2),
                         Math.floor(2 * Math.random()) + 2,
                         8,
@@ -199,8 +207,15 @@ export default class Game {
                 this.onScoreChanged(++this.score);
 
                 if (!this.bricks.length) {
+                    this.level++;
                     this.unbindVausControl();
-                    this.onGameFinished();
+
+                    if (this.levels[this.level - 1]) {
+                        this.onLevelFinished();
+                    } else {
+                        this.onGameFinished();
+                    }
+
                     return;
                 }
 
@@ -233,7 +248,7 @@ export default class Game {
                 bonus.clear(this.ctx);
             } else if (bonus.y - bonus.radius >= canvas.height) {
                 this.bonuses.splice(i, 1);
-            }else {
+            } else {
                 bonus.draw(this.ctx);
             }
         })
@@ -252,8 +267,6 @@ export default class Game {
     }
 
     public start(): void {
-        this.score = 0;
-
         this.onScoreChanged(this.score);
         this.bindVausControl();
         this.loop();

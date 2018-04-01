@@ -11,12 +11,19 @@
 <body>
     <div class="container">
         <h1 class="header">Arkanoid</h1>
+        <div class="subheader">
+            <div class="game-level">Current level:&nbsp;<div class="level">1</div></div>
+            <div class="game-score">Score:&nbsp;<div class="counter">0</div></div>
+        </div>
         <div class="canvas-container">
             <canvas class="canvas"></canvas>
-            <div class="game-score">Score: <div class="counter">0</div></div>
             <div class="game-controls">
-                <button class="play">Play</button>
-                <button class="repeat">Repeat</button>
+                <div class="button play">Play</div>
+                <div class="button repeat">Repeat</div>
+            </div>
+            <div class="congratulations">
+                YOU ARE THE WINNER!
+                <div class="subheader">Your score: <div class="score"></div></span>
             </div>
         </div>
     </div>

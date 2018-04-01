@@ -1,5 +1,6 @@
 body {
     background-color: black;
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
 
 .header {
@@ -7,6 +8,15 @@ body {
     text-transform: uppercase;
 
     color: aliceblue;
+
+    text-shadow: 0 0 36px rgba(100, 100, 255, 1);
+}
+
+.subheader {
+    display: flex;
+    justify-content: space-around;
+
+    padding-bottom: 12px;
 }
 
 .container {
@@ -37,7 +47,7 @@ body {
     right: 0;
     position: absolute;
     z-index: -1;
-  }
+}
 
 .game-controls {
     position: absolute;
@@ -46,27 +56,65 @@ body {
     transform: translate(-50%, -50%);
 }
 
-.canvas-container.playing .game-controls {
+.canvas-container.playing .game-controls,
+.canvas-container.finished .game-controls {
     display: none;
 }
 
-.canvas-container:not(.failed) .game-controls > button.repeat {
+.canvas-container:not(.failed) .game-controls > .repeat {
     display: none;
 }
 
-.canvas-container.failed .game-controls > button.play {
+.canvas-container.failed .game-controls > .play {
     display: none;
 }
 
-.game-controls > button {
+.game-controls > .button {
     width: 100px;
     height: 50px;
     border-radius: 10px;
+    display: flex;
+    color: aliceblue;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 0px 6px 3px rgba(100, 100, 255, 1);
+    font-size: 19px;
+    text-transform: uppercase;
+    background: rgba(0,0,0, 0.5);
+    cursor: pointer;
 }
 
-.game-score {
-    position: absolute;
+.game-score,
+.game-level {
     display: flex;
-    padding-left: 6px;
+
+    color: aliceblue;
+}
+
+.canvas-container:not(.finished) .congratulations {
+    display: none;
+}
+
+.congratulations {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    font-size: 72px;
+    color: aliceblue;
+    text-align: center;
+    text-transform: uppercase;
+
+    text-shadow: 0 0 36px rgba(100, 100, 255, 1);
+}
+
+.congratulations > .subheader {
+    font-size: 36px;
+    text-transform: capitalize;
+}
+
+.congratulations > .subheader > .score {
+    display: inline;
 }
 
