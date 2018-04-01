@@ -4,17 +4,14 @@ import levelBrickSets from './levelBrickSets';
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = <HTMLCanvasElement>document.querySelector('.canvas');
 
-    if (!canvas) {
-        return;
-    }
-
     canvas.width = 640;
     canvas.height = 480;
 
     const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
     const canvasContainer = <HTMLElement>document.querySelector('.canvas-container');
-    const scoreCounter = <HTMLElement>document.querySelector('.congratulations .score');
     const currentLevel = <HTMLElement>document.querySelector('.game-level > .level');
+    const scoreCounter = <HTMLElement>document.querySelector('.game-score .counter');
+
     const playButton = <HTMLElement>document.querySelector('.game-controls .play');
     const repeatButton = <HTMLElement>document.querySelector('.game-controls .repeat');
 
@@ -22,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx,
         levelBrickSets,
         function onScoreChanged(score: number) {
-            scoreCounter.innerText = score.toString();
+            scoreCounter.innerText = game.score.toString();
         },
         function onLevelFinished() {
             game.init();
@@ -31,7 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
             currentLevel.innerText = game.level.toString();
         },
         function onGameFinished() {
-            scoreCounter.innerText = game.score.toString();
+            const finalScore = <HTMLElement>document.querySelector('.congratulations .score');
+            finalScore.innerText = game.score.toString();
 
             canvasContainer.classList.remove('playing');
             canvasContainer.classList.add('finished');

@@ -14,7 +14,7 @@ body {
 
 .subheader {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
 
     padding-bottom: 12px;
 }
