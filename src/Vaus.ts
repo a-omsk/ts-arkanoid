@@ -3,12 +3,12 @@ import CanvasShape, { CanvasShapeBounds } from './CanvasShape';
 export default class Vaus extends CanvasShape {
     public width: number;
     public height: number;
-
+    public velocity: number;
     public color: string;
 
-    public newX: number | null;
+    private newX: number | null;
 
-    constructor(x: number, y: number, width: number, height: number, color: string) {
+    constructor(x: number, y: number, width: number, height: number, color: string, velocity: number) {
         super(x, y);
 
         this.newX = null;
@@ -17,6 +17,7 @@ export default class Vaus extends CanvasShape {
         this.height = height;
 
         this.color = color;
+        this.velocity = velocity;
     }
 
     draw(ctx: CanvasRenderingContext2D): void {

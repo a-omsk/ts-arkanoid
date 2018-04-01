@@ -1,6 +1,12 @@
+body {
+    background-color: black;
+}
+
 .header {
     text-align: center;
     text-transform: uppercase;
+
+    color: aliceblue;
 }
 
 .container {
@@ -15,11 +21,23 @@
 }
 
 .canvas {
-    border: 1px solid gray;
+    box-shadow: 0px 0px 6px 3px rgba(100, 100, 255, 1);
 
     width: 640px;
     height: 480px;
 }
+
+.canvas-container::after {
+    content: "";
+    background: url('background.jpg');
+    opacity: 0.5;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    z-index: -1;
+  }
 
 .game-controls {
     position: absolute;

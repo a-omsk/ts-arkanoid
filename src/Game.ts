@@ -16,6 +16,11 @@ export default class Game {
     private vaus: Vaus | null;
     private ball: Ball | null;
     private mouseHandler: any;
+    private buttonPressHandler: any;
+    private buttonReleaseHandler: any;
+
+    private leftButtonPressed: boolean;
+    private rightButtonPressed: boolean;
 
     private onScoreChanged: Function;
     private onGameFinished: Function;
@@ -33,7 +38,12 @@ export default class Game {
         this.vaus = null;
         this.ball = null;
 
+        this.leftButtonPressed = false;
+        this.rightButtonPressed = false;
+
         this.mouseHandler = null;
+        this.buttonReleaseHandler = null;
+        this.buttonPressHandler = null;
         this.onScoreChanged = onScoreChanged;
         this.onGameFinished = onGameFinished;
         this.onGameFailed = onGameFailed;
@@ -54,7 +64,7 @@ export default class Game {
         const vausX = Math.floor(this.ctx.canvas.clientWidth / 2) - (vausWidth / 2);
         const vausY = this.ctx.canvas.clientHeight - vausHeight - 10;
 
-        this.vaus = new Vaus(vausX, vausY, vausWidth, vausHeight, 'green');
+        this.vaus = new Vaus(vausX, vausY, vausWidth, vausHeight, 'green', 10);
         this.vaus.draw(this.ctx);
     }
 
@@ -94,13 +104,32 @@ export default class Game {
         const dx = Math.floor(Math.random() * this.level + 4);
         const dy = Math.floor(Math.random() * this.level + 4);
 
-        this.ball = new Ball(ballX, ballY, dx, dy, ballRadius, 'black');
+        this.ball = new Ball(ballX, ballY, dx, dy, ballRadius, 'white');
         this.ball.draw(this.ctx);
     }
 
     private bindVausControl(): void {
         const { canvas } = this.ctx;
         const { left } = canvas.getBoundingClientRect();
+
+        this.buttonPressHandler = (e: KeyboardEvent) => {
+            if (e.keyCode === 37) {
+                this.leftButtonPressed = true;
+            } else if (e.keyCode === 39) {
+                this.rightButtonPressed = true;
+            }
+        }
+
+        this.buttonReleaseHandler = (e: KeyboardEvent) => {
+            if (e.keyCode === 37) {
+                this.leftButtonPressed = false;
+            } else if (e.keyCode === 39) {
+                this.rightButtonPressed = false;
+            }
+        }
+
+        document.addEventListener('keydown', this.buttonPressHandler);
+        document.addEventListener('keyup', this.buttonReleaseHandler);
 
         this.mouseHandler = (e: MouseEvent) => {
             const newVausPosition = Math.floor(e.clientX - left);
@@ -118,11 +147,19 @@ export default class Game {
         const { canvas } = this.ctx;
 
         canvas.removeEventListener('mousemove', this.mouseHandler);
+        document.removeEventListener('keydown', this.buttonPressHandler);
+        document.removeEventListener('keyup', this.buttonReleaseHandler);
     }
 
     private loop(): void {
         const vaus = <Vaus>this.vaus;
         const ball = <Ball>this.ball;
+        const { canvas } = this.ctx;
+
+        if (this.rightButtonPressed || this.leftButtonPressed) {
+            const newX = this.rightButtonPressed ? vaus.x + vaus.velocity : vaus.x - vaus.velocity;
+            vaus.move(newX + (vaus.width / 2), canvas.width);
+        }
 
         const hasBottomBorderIntersection = ball.changeDirectionIfIntersectsBorder(this.ctx);
 
@@ -150,7 +187,7 @@ export default class Game {
                     const bonus = new Bonus(
                         brick.x + ( brick.width / 2),
                         brick.y + (brick.height / 2),
-                        2,
+                        Math.floor(2 * Math.random()) + 2,
                         8,
                         'pink'
                     );
@@ -179,6 +216,7 @@ export default class Game {
     private drawShapes(): void {
         const vaus = <Vaus>this.vaus;
         const ball = <Ball>this.ball;
+        const { canvas } = this.ctx;
 
         ball.clear(this.ctx);
         this.bonuses.forEach(bonus => bonus.clear(this.ctx));
@@ -193,9 +231,9 @@ export default class Game {
                 this.bonuses.splice(i, 1);
 
                 bonus.clear(this.ctx);
-
-
-            } else {
+            } else if (bonus.y - bonus.radius >= canvas.height) {
+                this.bonuses.splice(i, 1);
+            }else {
                 bonus.draw(this.ctx);
             }
         })

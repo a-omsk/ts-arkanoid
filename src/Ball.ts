@@ -6,8 +6,9 @@ export default class Ball extends CanvasShape {
 
     public radius: number;
     public color: string;
+    public glowFactor: number;
 
-    constructor(x: number, y: number, dx: number, dy: number, radius: number, color: string) {
+    constructor(x: number, y: number, dx: number, dy: number, radius: number, color: string, glowFactor: number = 3) {
         super(x, y);
 
         this.x = x;
@@ -18,12 +19,17 @@ export default class Ball extends CanvasShape {
 
         this.radius = radius;
         this.color = color;
+        this.glowFactor = glowFactor;
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
         ctx.save();
 
+        ctx.shadowColor = 'rgba(100, 100, 255, 1)';
+
         ctx.fillStyle = this.color;
+        ctx.shadowBlur = this.radius * 3;
+
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -37,7 +43,14 @@ export default class Ball extends CanvasShape {
     }
 
     clear(ctx: CanvasRenderingContext2D): void {
-        ctx.clearRect(this.x - this.radius, this.y - this.radius, this.radius * 2, this.radius * 2)
+        const glowedRadius = this.radius * this.glowFactor;
+
+        ctx.clearRect(
+            this.x - glowedRadius,
+            this.y - glowedRadius,
+            glowedRadius * 2,
+            glowedRadius * 2
+        )
     }
 
     getBounds(): CanvasShapeBounds {
