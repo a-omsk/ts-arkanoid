@@ -8,30 +8,29 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
-
     canvas.width = 640;
     canvas.height = 480;
 
+    const ctx = <CanvasRenderingContext2D>canvas.getContext("2d");
     const canvasContainer = <HTMLElement>document.querySelector('.canvas-container');
+    const scoreCounter = <HTMLElement>document.querySelector('.congratulations .score');
+    const currentLevel = <HTMLElement>document.querySelector('.game-level > .level');
+    const playButton = <HTMLElement>document.querySelector('.game-controls .play');
+    const repeatButton = <HTMLElement>document.querySelector('.game-controls .repeat');
 
     const game = new Game(
         ctx,
         levelBrickSets,
         function onScoreChanged(score: number) {
-            const scoreCounter = <HTMLElement>document.querySelector('.game-score > .counter');
             scoreCounter.innerText = score.toString();
         },
         function onLevelFinished() {
             game.init();
             canvasContainer.classList.remove('playing');
 
-            const currentLevel = <HTMLElement>document.querySelector('.game-level > .level');
-
             currentLevel.innerText = game.level.toString();
         },
         function onGameFinished() {
-            const scoreCounter = <HTMLElement>document.querySelector('.congratulations .score');
             scoreCounter.innerText = game.score.toString();
 
             canvasContainer.classList.remove('playing');
@@ -42,12 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
             canvasContainer.classList.add('failed');
             game.resetLevels();
             game.resetScore();
+
+            currentLevel.innerText = game.level.toString();
         });
 
     game.init();
-
-    const playButton = <HTMLElement>document.querySelector('.game-controls .play');
-    const repeatButton = <HTMLElement>document.querySelector('.game-controls .repeat');
 
     playButton.addEventListener('click', () => {
         canvasContainer.classList.add('playing');
