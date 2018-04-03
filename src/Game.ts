@@ -143,6 +143,7 @@ export default class Game {
             const newVausPosition = Math.floor(e.clientX - left);
 
             if (this.vaus) {
+                this.vaus.clear(this.ctx);
                 this.vaus.move(newVausPosition, canvas.width);
             }
         };
@@ -166,6 +167,7 @@ export default class Game {
 
         if (this.rightButtonPressed || this.leftButtonPressed) {
             const newX = this.rightButtonPressed ? vaus.x + vaus.velocity : vaus.x - vaus.velocity;
+            vaus.clear(this.ctx);
             vaus.move(newX + (vaus.width / 2), canvas.width);
         }
 
@@ -234,9 +236,14 @@ export default class Game {
         const { canvas } = this.ctx;
 
         ball.clear(this.ctx);
+        vaus.clear(this.ctx);
+
         this.bonuses.forEach(bonus => bonus.clear(this.ctx));
 
-        this.bricks.forEach(brick => brick.draw(this.ctx));
+        this.bricks.forEach(brick => {
+            brick.clear(this.ctx);
+            brick.draw(this.ctx)
+        });
         this.bonuses.forEach((bonus, i) => {
             bonus.move();
 
